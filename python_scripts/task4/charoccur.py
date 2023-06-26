@@ -7,8 +7,10 @@ Given an input string, count occurrences of all characters within a string
 
 import argparse
 
-parser=argparse.ArgumentParser(description="""Displays total nmber of different charactrs in a string.""")
-parser.add_argument("string",help="input string", type=str) 
+parser=argparse.ArgumentParser(description="""
+Displays total nmber of different charactrs in a string.
+""")
+parser.add_argument("string",help="input string", type=str)
 
 args=parser.parse_args()
 dict_of_chars={}
