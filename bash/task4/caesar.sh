@@ -1,5 +1,6 @@
 #!/bin/bash
-#use example 
+#use example
+#Write caesar cipher script accepting three parameters -s <shift> -i <input file> -o <output file>
 # -s <SHIFT_VALUE> -i <INPUT_FILE> -o <OUTPUTFILE> 
 while getopts ":s:i:o:" arg; do
   case ${arg} in
