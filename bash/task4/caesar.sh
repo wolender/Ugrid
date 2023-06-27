@@ -29,7 +29,29 @@ caesarEncrypt (){
     if [[ $CHAR =~ [a-z] ]]; then
 
       ASCII_VAL=$(printf "%d" "'$CHAR") #TO ASCII TRANSFORMATION
-      END_VAL=$((( ASCII_VAL - 97 + SHIFT ) % 26 + 97))
+      if [[ $(( ASCII_VAL - 97 + SHIFT )) -le 0 ]]; then
+        MODVAL=$(( ASCII_VAL - 97 + 26 + SHIFT ))
+      else
+        MODVAL=$(( ASCII_VAL - 97 + SHIFT ))
+      fi
+
+      END_VAL=$(( MODVAL % 26 + 97))
+      END_CHAR=$(printf "\\$(printf %o "$END_VAL")") #TO CHAR TRANSFORMATION
+
+      FINAL_TEXT+=$END_CHAR
+    
+    
+
+    elif [[ $CHAR =~ [A-Z] ]]; then # for uppercase letters
+
+      ASCII_VAL=$(printf "%d" "'$CHAR") #TO ASCII TRANSFORMATION
+      if [[ $(( ASCII_VAL - 64 + SHIFT )) -le 0 ]]; then
+        MODVAL=$(( ASCII_VAL - 64 + 26 + SHIFT ))
+      else
+        MODVAL=$(( ASCII_VAL - 64 + SHIFT ))
+      fi
+
+      END_VAL=$(( MODVAL % 26 + 64))
       END_CHAR=$(printf "\\$(printf %o "$END_VAL")") #TO CHAR TRANSFORMATION
 
       FINAL_TEXT+=$END_CHAR
@@ -49,7 +71,7 @@ else
   echo "Input file not found."
   exit 1
 fi
-
+#caesarEncrypt
 encrypted_text=$(caesarEncrypt)
 
 echo "$encrypted_text" > $OUTPUTFILE
