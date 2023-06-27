@@ -77,26 +77,67 @@ There should be at least 3 questions and 2 recipients.
 """
 
 import requests
+import http.client
+import json
 
-URL="https://developer.surveymonkey.com/apps/109210/"
-ACCESS_TOKEN="Yya8.NW4a0iZVuIl3LgNwg3Z59Yoj85b2Nbfu-SQQPOL0VQ37x1gsfb-oCqg.t5i4qNjwDRmJSxxRjZbyRvkIjcCUY-lS1plf7Vo8rc4hx3JZk93NXbRQ0vmsg4lmusj"
-SECRET="338261461392545728117431788066757798226"
-SURVEY_ID=0
+ACCESS_TOKEN="cMFftolwVdUKH2zJtk2zDOMeAKkYgQk3RxT7usJRmmEjnrLw8YQ52QIhm7OhjibN.Mz86CNoWe1tq06i52S982BC5bqZrzuIykpxGsAxAa2vsOUmnD3vqJUJwObv4ten"
 
+conn = http.client.HTTPSConnection("api.surveymonkey.com")
 
-headers = {
-    "Authorization": "Bearer " + ACCESS_TOKEN,
-    "Content-Type": "application/json"
+payload ={
+  "title": "New Survey",
+  "from_template_id": "",
+  "from_survey_id": "",
+  "from_team_template_id": "",
+  "nickname": "My Survey",
+  "language": "en",
+  "buttons_text": {
+    "next_button": "string",
+    "prev_button": "string",
+    "exit_button": "string",
+    "done_button": "string"
+  },
+  "custom_variables": {},
+  "footer": 'true',
+  "folder_id": "",
+  "theme_id": 1506280,
+  "quiz_options": {
+    "is_quiz_mode": 'true',
+    "default_question_feedback": {
+      "correct_text": "string",
+      "incorrect_text": "string",
+      "partial_text": "string"
+    },
+    "show_results_type": "string",
+    "feedback": {
+      "ranges_type": "string",
+      "ranges": [
+        {
+          "min": 0,
+          "max": 0,
+          "message": "string"
+        }
+      ]
+    }
+  },
+  "pages": [
+    {
+      "questions": [
+        "See formatting question types for more details"
+      ]
+    }
+  ]
 }
+print(type(payload))
+headers = {
+    'Content-Type': "application/json",
+    'Accept': "application/json",
+    'Authorization': f"Bearer {ACCESS_TOKEN}"
+    }
 
-url = f"https://api.surveymonkey.com/v3/surveys/{SURVEY_ID}"
+conn.request("POST", "/v3/surveys", body=payload, headers=headers)
 
-response = requests.get(url, headers=headers,timeout=10)
+res = conn.getresponse()
+data = res.read()
 
-if response.status_code == 200:
-    survey_data = response.json()
-    # Process the survey data as needed
-else:
-    print("Error:", response.text)
-
-print(response)
+print(data.decode("utf-8"))
