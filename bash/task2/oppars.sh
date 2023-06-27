@@ -52,7 +52,6 @@ for arg in "$@"; do
 done
 
 
-
 if [ $debug -eq 1 ]; then
     print_debug_info
 fi  
