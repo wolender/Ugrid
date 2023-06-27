@@ -34,7 +34,7 @@ toLower() {
     transformed=$(echo "$TEXT" | tr '[:upper:]' '[:lower:]')
 }
 reversed() {
-    transformed=$(echo "$TEXT" | tac ) # "brew install coreutils" needed to work
+    transformed=$(echo "$TEXT" | nl | sort -nr | cut -f 2- ) #numbres the lines in a file then sort them, then cut the numbers
 }
 
 substitute () {
@@ -114,7 +114,8 @@ fi
 if [[ -f $OUTPUTFILE ]]; then
     echo "$transformed" > $OUTPUTFILE
 else 
-    echo "No outputfile"
-    exit 1
+    touch $OUTPUTFILE
+    echo "Output file created"
+    echo "$transformed" > $OUTPUTFILE
 fi
 

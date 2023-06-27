@@ -1,2 +1,2 @@
-HELLO, WORLD!!
-HOW ARE YOU?
+Hello, World!!
+How are You?
