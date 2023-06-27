@@ -48,6 +48,10 @@ for arg in "$@"; do
   esac
 done
 
+echo ${numbers[@]}
+if [[ $operator == * ]]; then #works for * as a parameter
+  operator='*'
+fi
 if [ $debug -eq 1 ]; then
     print_debug_info
 fi  
