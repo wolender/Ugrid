@@ -35,6 +35,9 @@ for arg in "$@"; do
     -o)
         shift 
         operator=$1
+        if [[ $operator == * ]]; then #works for * as a parameter
+          operator='*'
+        fi
         ;;
     *)
       if [[ $arg =~ [0-9] ]]; then
@@ -47,6 +50,8 @@ for arg in "$@"; do
 
   esac
 done
+
+
 
 if [ $debug -eq 1 ]; then
     print_debug_info
