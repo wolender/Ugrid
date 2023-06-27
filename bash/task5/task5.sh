@@ -41,7 +41,7 @@ substitute () {
     transformed=$(echo "$TEXT" | sed "s/${words[0]}/${words[1]}/g") # sed s for substitute s/<A-WORD>/<B-WORD>/g for global
 }
 
-while getopts ":vrIui:o:s:" arg; do
+while getopts ":vrlui:o:s:" arg; do
   case ${arg} in
     v)    
         UPTOLOWER=1
@@ -51,7 +51,7 @@ while getopts ":vrIui:o:s:" arg; do
         REVERSE=1
     ;;
 
-    I)
+    l)
         ALLTOLOWER=1
     ;;
 
