@@ -7,7 +7,7 @@ from email.message import EmailMessage
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 
-def gmail_send_message(content):
+def gmail_send_message(content,email):
     """Create and send an email message
     Print the returned  message id
     Returns: Message object, including message id
@@ -26,7 +26,7 @@ def gmail_send_message(content):
 
         message.set_content(content)
 
-        message['To'] = 'wiktorqwe1234@gmail.com'
+        message['To'] = f'{email}'
         message['From'] = 'msurvey203@gmail.com'
         message['Subject'] = 'Automated draft'
 
@@ -48,4 +48,4 @@ def gmail_send_message(content):
 
 
 if __name__ == '__main__':
-    gmail_send_message("messege")
+    gmail_send_message(content="messege",email="wiktorqwe1234@gmail.com")
