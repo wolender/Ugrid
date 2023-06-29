@@ -2,14 +2,12 @@
 from __future__ import print_function
 
 import base64
-from email.message import EmailMessage
-
-import google.auth
-from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from email.message import EmailMessage
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
 
-
-def gmail_send_message():
+def gmail_send_message(content):
     """Create and send an email message
     Print the returned  message id
     Returns: Message object, including message id
@@ -18,13 +16,15 @@ def gmail_send_message():
     TODO(developer) - See https://developers.google.com/identity
     for guides on implementing OAuth2 for the application.
     """
-    creds, _ = google.auth.default()
+    SCOPES = ['https://www.googleapis.com/auth/gmail.send']
+    flow = InstalledAppFlow.from_client_secrets_file('cred.json',SCOPES)
+    creds = flow.run_local_server(port=0)
 
     try:
         service = build('gmail', 'v1', credentials=creds)
         message = EmailMessage()
 
-        message.set_content('This is automated draft mail')
+        message.set_content(content)
 
         message['To'] = 'wiktorqwe1234@gmail.com'
         message['From'] = 'msurvey203@gmail.com'
@@ -48,4 +48,4 @@ def gmail_send_message():
 
 
 if __name__ == '__main__':
-    gmail_send_message()
+    gmail_send_message("messege")

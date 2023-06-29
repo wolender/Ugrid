@@ -76,14 +76,48 @@ The structure of a JSON file with questions:
 There should be at least 3 questions and 2 recipients.
 """
 
+from email.message import EmailMessage
 import requests
 import json
+from googleapiclient.discovery import build
+import base64
+from google_auth_oauthlib.flow import InstalledAppFlow
 
 
 ACCESS_TOKEN="cMFftolwVdUKH2zJtk2zDOMeAKkYgQk3RxT7usJRmmEjnrLw8YQ52QIhm7OhjibN.Mz86CNoWe1tq06i52S982BC5bqZrzuIykpxGsAxAa2vsOUmnD3vqJUJwObv4ten"
 
 
 
+def send_invitations(messege_string):
+  SCOPES = ['https://www.googleapis.com/auth/gmail.send']
+  
+
+  # Create the flow for handling OAuth authentication
+  flow = InstalledAppFlow.from_client_secrets_file(
+      'cred.json',
+      SCOPES
+  )
+  credentials = flow.run_local_server(port=0)
+
+  # Build the Gmail service
+  service = build('gmail', 'v1', credentials=credentials)
+
+  # Compose the email message
+  message = EmailMessage()
+  message.set_content('This is automated draft mail')
+
+  message['To'] = 'wiktorqwe1234@gmail.com'
+  message['From'] = 'msurvey203@gmail.com'
+  message['Subject'] = 'Automated draft'
+  encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
+
+  create_message = {
+      'message': {
+          'raw': encoded_message
+      }
+  }
+  # Send the email
+  draft = service.users().drafts().create(userId="me",body=create_message).execute()
 
 def getErrorr():
     headers = {
@@ -107,22 +141,22 @@ def postSurvey():
     response=requests.post(URL, headers=headers,data=body)
     print(response.json())
     survey_id=response.json()["id"]
-    print(survey_id)
     return survey_id
 
-def get_surveys():
+def get_survey(id):
     
 
     headers = {
         'Accept': "application/json",
         'Authorization': f"Bearer {ACCESS_TOKEN}"
         }
-    URL="https://api.surveymonkey.com/v3/surveys"
+    URL=f"https://api.surveymonkey.com/v3/surveys/{id}"
     response=requests.get(URL, headers=headers,)
 
     print(response.json())
 
 
 
-postSurvey()
 
+#get_survey(postSurvey())
+send_invitations("Hello")
