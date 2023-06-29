@@ -76,68 +76,56 @@ The structure of a JSON file with questions:
 There should be at least 3 questions and 2 recipients.
 """
 
-import requests
 import http.client
 import json
+
 
 ACCESS_TOKEN="cMFftolwVdUKH2zJtk2zDOMeAKkYgQk3RxT7usJRmmEjnrLw8YQ52QIhm7OhjibN.Mz86CNoWe1tq06i52S982BC5bqZrzuIykpxGsAxAa2vsOUmnD3vqJUJwObv4ten"
 
 conn = http.client.HTTPSConnection("api.surveymonkey.com")
 
-payload ={
-  "title": "New Survey",
-  "from_template_id": "",
-  "from_survey_id": "",
-  "from_team_template_id": "",
-  "nickname": "My Survey",
-  "language": "en",
-  "buttons_text": {
-    "next_button": "string",
-    "prev_button": "string",
-    "exit_button": "string",
-    "done_button": "string"
-  },
-  "custom_variables": {},
-  "footer": 'true',
-  "folder_id": "",
-  "theme_id": 1506280,
-  "quiz_options": {
-    "is_quiz_mode": 'true',
-    "default_question_feedback": {
-      "correct_text": "string",
-      "incorrect_text": "string",
-      "partial_text": "string"
-    },
-    "show_results_type": "string",
-    "feedback": {
-      "ranges_type": "string",
-      "ranges": [
-        {
-          "min": 0,
-          "max": 0,
-          "message": "string"
-        }
-      ]
+
+def getErrorr():
+    headers = {
+    'Accept': "application/json",
+    'Authorization': f"Bearer {ACCESS_TOKEN}"
     }
-  },
-  "pages": [
-    {
-      "questions": [
-        "See formatting question types for more details"
-      ]
-    }
-  ]
-}
-print(type(payload))
-headers = {
+    conn.request("GET", "/v3/errors", headers=headers)
+    res = conn.getresponse()
+    data = res.read()
+    print(data.decode("utf-8"))
+
+def postSurvey():
+    headers = {
     'Content-Type': "application/json",
     'Accept': "application/json",
     'Authorization': f"Bearer {ACCESS_TOKEN}"
     }
+    with open("questions.json") as f:
+        data = json.load(f)
+    body=json.dumps(data)
+    print(type(body))
+    conn.request("POST", "/v3/surveys", headers=headers, body=body)
+    res = conn.getresponse()
+    data = res.read()
+    print(data.decode("utf-8"))
 
-conn.request("POST", "/v3/surveys", body=payload, headers=headers)
+def get_surveys():
+    conn = http.client.HTTPSConnection("api.surveymonkey.com")
 
-res = conn.getresponse()
-data = res.read()
+    headers = {
+        'Accept': "application/json",
+        'Authorization': f"Bearer {ACCESS_TOKEN}"
+        }
 
-print(data.decode("utf-8"))
+    conn.request("GET", "/v3/surveys", headers=headers)
+
+    res = conn.getresponse()
+    data = res.read()
+
+    print(data.decode("utf-8"))
+
+
+
+get_surveys()
+
