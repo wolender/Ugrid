@@ -1,0 +1,38 @@
+{
+    "title": "Example Survey",
+    "pages": [
+      {
+        "title": "My First Page",
+        "description": "Page description",
+        "position": 1,
+        "questions": [
+          {
+            "family": "single_choice",
+            "subtype": "vertical",
+            "answers": {
+              "choices": [
+                {
+                  "text": "Apple",
+                  "position": 1
+                },
+                {
+                  "text": "Orange",
+                  "position": 2
+                },
+                {
+                  "text": "Banana",
+                  "position": 3
+                }
+              ]
+            },
+            "headings": [
+              {
+                "heading": "What is your favourite fruit?"
+              }
+            ],
+            "position": 1
+          }
+        ]
+      }
+    ]
+  }

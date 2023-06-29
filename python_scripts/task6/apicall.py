@@ -76,13 +76,13 @@ The structure of a JSON file with questions:
 There should be at least 3 questions and 2 recipients.
 """
 
-import http.client
+import requests
 import json
 
 
 ACCESS_TOKEN="cMFftolwVdUKH2zJtk2zDOMeAKkYgQk3RxT7usJRmmEjnrLw8YQ52QIhm7OhjibN.Mz86CNoWe1tq06i52S982BC5bqZrzuIykpxGsAxAa2vsOUmnD3vqJUJwObv4ten"
 
-conn = http.client.HTTPSConnection("api.surveymonkey.com")
+
 
 
 def getErrorr():
@@ -90,10 +90,9 @@ def getErrorr():
     'Accept': "application/json",
     'Authorization': f"Bearer {ACCESS_TOKEN}"
     }
-    conn.request("GET", "/v3/errors", headers=headers)
-    res = conn.getresponse()
-    data = res.read()
-    print(data.decode("utf-8"))
+    response=requests.get("GET", "/v3/errors", headers=headers)
+
+    print(response.json())
 
 def postSurvey():
     headers = {
@@ -101,31 +100,29 @@ def postSurvey():
     'Accept': "application/json",
     'Authorization': f"Bearer {ACCESS_TOKEN}"
     }
+    URL="https://api.surveymonkey.com/v3/surveys"
     with open("questions.json") as f:
         data = json.load(f)
     body=json.dumps(data)
-    print(type(body))
-    conn.request("POST", "/v3/surveys", headers=headers, body=body)
-    res = conn.getresponse()
-    data = res.read()
-    print(data.decode("utf-8"))
+    response=requests.post(URL, headers=headers,data=body)
+    print(response.json())
+    survey_id=response.json()["id"]
+    print(survey_id)
+    return survey_id
 
 def get_surveys():
-    conn = http.client.HTTPSConnection("api.surveymonkey.com")
+    
 
     headers = {
         'Accept': "application/json",
         'Authorization': f"Bearer {ACCESS_TOKEN}"
         }
+    URL="https://api.surveymonkey.com/v3/surveys"
+    response=requests.get(URL, headers=headers,)
 
-    conn.request("GET", "/v3/surveys", headers=headers)
-
-    res = conn.getresponse()
-    data = res.read()
-
-    print(data.decode("utf-8"))
+    print(response.json())
 
 
 
-get_surveys()
+postSurvey()
 
