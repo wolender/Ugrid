@@ -17,7 +17,7 @@ def gmail_send_message(content,email):
     for guides on implementing OAuth2 for the application.
     """
     SCOPES = ['https://www.googleapis.com/auth/gmail.send']
-    flow = InstalledAppFlow.from_client_secrets_file('cred.json',SCOPES)
+    flow = InstalledAppFlow.from_client_secrets_file('~/Google/cred.json',SCOPES)
     creds = flow.run_local_server(port=0)
 
     try:
