@@ -6,7 +6,7 @@ If there is no extension - an exception should be raised.
 
 import argparse
 
-parser = argparse.ArgumentParser(description='What the program does')
+parser = argparse.ArgumentParser(description='Returns the extenssion of a provided file')
 parser.add_argument('FILENAME', help="Provide a filename")
 
 args = parser.parse_args()
