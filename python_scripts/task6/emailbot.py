@@ -12,12 +12,9 @@ from google.auth.transport.requests import Request
 
 def gmail_send_message(content,email):
     """Create and send an email message
+    content is the email messege and email is the address that gets the email
     Print the returned  message id
     Returns: Message object, including message id
-
-    Load pre-authorized user credentials from the environment.
-    TODO(developer) - See https://developers.google.com/identity
-    for guides on implementing OAuth2 for the application.
     """
     SCOPES = ['https://www.googleapis.com/auth/gmail.send']
     creds = None

@@ -83,6 +83,7 @@ import emailbot
 ACCESS_TOKEN="cMFftolwVdUKH2zJtk2zDOMeAKkYgQk3RxT7usJRmmEjnrLw8YQ52QIhm7OhjibN.Mz86CNoWe1tq06i52S982BC5bqZrzuIykpxGsAxAa2vsOUmnD3vqJUJwObv4ten"
 
 def getErrorr():
+    """returns list of errors pulled from survey monkey api"""
     headers = {
     'Accept': "application/json",
     'Authorization': f"Bearer {ACCESS_TOKEN}"
@@ -92,6 +93,7 @@ def getErrorr():
     print(response.json())
 
 def postSurvey():
+    """posts survey located in questions.json file to surveymonkey api"""
     headers = {
     'Content-Type': "application/json",
     'Accept': "application/json",
@@ -106,7 +108,7 @@ def postSurvey():
     return survey_id
 
 def get_survey(id):
-    
+    """gets survey fom the api based on survey id"""
 
     headers = {
         'Accept': "application/json",
@@ -118,6 +120,7 @@ def get_survey(id):
     print(response.json())
 
 def create_weblink(id):
+  """creates invite link for created survey and returns link that gets sent out"""
   headers = {
   'Content-Type': "application/json",
   'Accept': "application/json",
@@ -130,10 +133,10 @@ def create_weblink(id):
   data=json.dumps(body)
   URL=f"https://api.surveymonkey.com/v3/surveys/{id}/collectors"
   response=requests.post(URL, headers=headers, data=data)
-  print(response.json()["url"])
   return response.json()["url"]
 
 def get_collectors(id):
+    """returns collectors for survey, can get weblink for instance"""
     headers = {
     'Accept': "application/json",
     'Authorization': f"Bearer {ACCESS_TOKEN}"
@@ -144,6 +147,7 @@ def get_collectors(id):
     return response.json()['id']
 
 def get_collector(id):
+    """returns specifiic collector"""
     headers = {
     'Accept': "application/json",
     'Authorization': f"Bearer {ACCESS_TOKEN}"
@@ -154,6 +158,7 @@ def get_collector(id):
     return response.json()['url']
 
 def parse_reps():
+  """returns list of email adresses from recipients.txt file"""
   reps=[]
   with open("recipients.txt","r",encoding="UTF-8") as f:
       for line in f:
@@ -165,6 +170,7 @@ if __name__ == '__main__':
   webllink=create_weblink(postSurvey())
   email_list=parse_reps()
   for email in email_list:
+     #sends emails with survey
      emailbot.gmail_send_message(content=webllink,email=email)
   
 
