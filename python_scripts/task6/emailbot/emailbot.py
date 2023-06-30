@@ -62,5 +62,4 @@ def gmail_send_message(content,email):
     return send_message
 
 
-if __name__ == '__main__':
-    gmail_send_message(content="messege",email="wiktorqwe1234@gmail.com")
+gmail_send_message(content="messege",email="wiktorqwe1234@gmail.com")
