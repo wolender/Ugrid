@@ -172,7 +172,3 @@ if __name__ == '__main__':
   for email in email_list:
      #sends emails with survey
      emailbot.gmail_send_message(content=webllink,email=email)
-  
-
-
-
