@@ -2,6 +2,8 @@
 """
 Given a list of integers. Remove duplicates from the list and create a tuple.
 Find the minimum and maximum number.
+examle:
+./intlist.py 7 1 2 7 4 4 5 6 
 """
 
 import argparse
