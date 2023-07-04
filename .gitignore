@@ -1,4 +1,6 @@
 .DS_Store
-/python_scripts/task6/emailbot/cred.json
-/python_scripts/task6/emailbot/token.json
+/python_scripts/task6/cred.json
+/python_scripts/task6/token.json
 /python_scripts/task6/__py*
+/python_scripts/task6/emailbot/__pycache__
+/python_scripts/task6/apicall/__pycache__
