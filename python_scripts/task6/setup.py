@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='SurveyMonkey',
     version='1.0.0',
-    packages=find_packages(),
+    packages=find_packages(include=["apicall","emailbot"]),
     author='Wiktor Olender',
     author_email='wikto.olender1@gmail.co',
     description='Create a survey and send it to list of emails',
