@@ -61,5 +61,3 @@ def gmail_send_message(content,email):
         send_message = None
     return send_message
 
-
-gmail_send_message(content="messege",email="wiktorqwe1234@gmail.com")
