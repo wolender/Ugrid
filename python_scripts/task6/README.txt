@@ -1,3 +1,4 @@
-python3 setup.py install
-put cred.json in to task6/emailboy/cred.json
-./apicall/apicall.py
+pip install -r requirements.txt
+mv cred.json /task6/cred.json
+mv token.json /task6/token.json
+./main.py
