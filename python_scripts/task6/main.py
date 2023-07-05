@@ -77,13 +77,13 @@ There should be at least 3 questions and 2 recipients.
 """
 
 
-import emailbot
-import apicall
+from emailbot import gmail_send_message
+from apicall import create_weblink, postSurvey, parse_reps
 
 
 if __name__ == '__main__':
-  webllink=apicall.create_weblink(apicall.postSurvey())
-  email_list=apicall.parse_reps()
+  webllink=create_weblink(postSurvey())
+  email_list=parse_reps()
   for email in email_list:
      #sends emails with survey
-     emailbot.gmail_send_message(content=webllink,email=email)
+     gmail_send_message(content=webllink,email=email)

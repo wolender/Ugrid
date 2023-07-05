@@ -1,4 +1,3 @@
 pip install -r requirements.txt
-mv cred.json /task6/cred.json
-mv token.json /task6/token.json
+mv cred.json python_scripts/task6/cred.json
 ./main.py

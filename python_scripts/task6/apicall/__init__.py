@@ -1,3 +1,2 @@
-# __init__.py
 
-from .apicall import *
+from .apicall import create_weblink, postSurvey, parse_reps

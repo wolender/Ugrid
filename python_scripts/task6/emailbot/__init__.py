@@ -1,1 +1,1 @@
-from .emailbot import *
+from .emailbot import gmail_send_message

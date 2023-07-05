@@ -1,5 +1,4 @@
 #!/usr/bin/env python3.7
-from __future__ import print_function
 
 import base64
 from googleapiclient.errors import HttpError
@@ -11,9 +10,8 @@ from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 
 def gmail_send_message(content,email):
-    """Create and send an email message
-    content is the email messege and email is the address that gets the email
-    Print the returned  message id
+    """Create and send an email message, 
+    content is the email messege and email is the address that gets the email.
     Returns: Message object, including message id
     """
     SCOPES = ['https://www.googleapis.com/auth/gmail.send']
@@ -25,6 +23,7 @@ def gmail_send_message(content,email):
         creds = Credentials.from_authorized_user_file('token.json', SCOPES)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
+        #If token has expired it gets refreshed so no further login are needed
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
