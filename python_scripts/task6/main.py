@@ -77,12 +77,16 @@ There should be at least 3 questions and 2 recipients.
 """
 
 
+import argparse
 from emailbot import gmail_send_message
-from apicall import create_weblink, postSurvey, parse_reps
+from apicall import create_weblink, post_survey, parse_reps
 
+parser=argparse.ArgumentParser(description="""
+Script creates survey from 'questions.json' file and send out invitations to emails from 'recipients.txt' file
+""")
 
 if __name__ == '__main__':
-  webllink=create_weblink(postSurvey())
+  webllink=create_weblink(post_survey())
   email_list=parse_reps()
   for email in email_list:
      #sends emails with survey

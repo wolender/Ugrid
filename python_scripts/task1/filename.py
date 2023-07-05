@@ -6,15 +6,15 @@ If there is no extension - an exception should be raised.
 
 import argparse
 
-parser = argparse.ArgumentParser(description='Returns the extenssion of a provided file')
+parser = argparse.ArgumentParser(description='Returns the extension of a provided file')
 parser.add_argument('FILENAME', help="Provide a filename")
 
 args = parser.parse_args()
 
 FILENAME=str(args.FILENAME)
 
-#spliting the filename in to a list of striings where . is the separator,
-# 1 for maxssplit to take multi doted extesions like .noarch.rpm
+#spliting the filename in to a list of strings where . is the separator,
+# 1 for maxsplit to take multi doted extesions like .noarch.rpm
 filelist=FILENAME.split('.',1)
 
 if len(filelist) < 2:

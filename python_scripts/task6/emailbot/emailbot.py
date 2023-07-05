@@ -1,11 +1,14 @@
 #!/usr/bin/env python3.7
 
+"""
+Handles Gmail auth and api calls
+"""
 import base64
-from googleapiclient.errors import HttpError
 from email.message import EmailMessage
+import os.path
+from googleapiclient.errors import HttpError
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
-import os.path
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 
@@ -14,13 +17,13 @@ def gmail_send_message(content,email):
     content is the email messege and email is the address that gets the email.
     Returns: Message object, including message id
     """
-    SCOPES = ['https://www.googleapis.com/auth/gmail.send']
+    api_scopes = ['https://www.googleapis.com/auth/gmail.send']
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
     if os.path.exists('token.json'):
-        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+        creds = Credentials.from_authorized_user_file('token.json', api_scopes)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         #If token has expired it gets refreshed so no further login are needed
@@ -28,10 +31,10 @@ def gmail_send_message(content,email):
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                'cred.json', SCOPES)
+                'cred.json', api_scopes)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
-        with open('token.json', 'w') as token:
+        with open('token.json', 'w',encoding="UTF-8") as token:
             token.write(creds.to_json())
 
     try:
@@ -59,4 +62,3 @@ def gmail_send_message(content,email):
         print(F'An error occurred: {error}')
         send_message = None
     return send_message
-
