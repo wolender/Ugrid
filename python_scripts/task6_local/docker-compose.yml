@@ -1,0 +1,18 @@
+services:
+  smtp_server:
+    image: rnwood/smtp4dev:v3
+    networks:
+      - monkeynetwork
+    ports:
+      - "2525:25"
+      - "3000:80"
+
+  surveymonkey:
+    image: sm:latest
+    volumes:
+      - ./send_email.py:/send_email.py
+    networks:
+      - monkeynetwork
+
+networks:
+  monkeynetwork:
