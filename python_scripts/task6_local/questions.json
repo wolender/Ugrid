@@ -1,0 +1,99 @@
+{
+    "title": "Example Survey",
+    "pages": [
+      {
+        "title": "My First Page",
+        "description": "Page description",
+        "position": 1,
+        "questions": [
+          {
+            "family": "single_choice",
+            "subtype": "vertical",
+            "answers": {
+              "choices": [
+                {
+                  "text": "Apple",
+                  "position": 1
+                },
+                {
+                  "text": "Orange",
+                  "position": 2
+                },
+                {
+                  "text": "Banana",
+                  "position": 3
+                }
+              ]
+            },
+            "headings": [
+              {
+                "heading": "What is your favourite fruit?"
+              }
+            ],
+            "position": 1
+          },
+          {
+            "family": "single_choice",
+            "subtype": "vertical",
+            "answers": {
+              "choices": [
+                {
+                  "text": "Blue",
+                  "position": 1
+                },
+                {
+                  "text": "Orange",
+                  "position": 2
+                },
+                {
+                  "text": "Red",
+                  "position": 3
+                },
+                {
+                    "text": "Green",
+                    "position": 4
+                  }
+              ]
+            },
+            "headings": [
+              {
+                "heading": "What is your favourite color?"
+              }
+            ],
+            "position": 2
+          },
+          {
+            "family": "single_choice",
+            "subtype": "vertical",
+            "answers": {
+              "choices": [
+                {
+                  "text": "Dog",
+                  "position": 1
+                },
+                {
+                  "text": "Cat",
+                  "position": 2
+                },
+                {
+                  "text": "Fish",
+                  "position": 3
+                },
+                {
+                    "text": "Other",
+                    "position": 4
+                  }
+              ]
+            },
+            "headings": [
+              {
+                "heading": "What is your favourite animal?"
+              }
+            ],
+            "position": 3
+          }
+
+        ]
+      }
+    ]
+  }
