@@ -18,17 +18,19 @@ parser.add_argument("filename",help="Logfile name")
 
 args=parser.parse_args()
 dict_of_agents={}
-COUNT=0
 with open (args.filename, 'r',encoding="UTF-8") as f:
-    for line in f:
+    while True:
         #getting the ip address
-        agent=line.split(' ',maxsplit=1)[0]
+        agent=f.readline().split(" ",maxsplit=1)[0] #using readline for efficiency
+        if not agent: #exit the loop if agent is empty
+            break
         #getting uniqe ones
         if agent not in dict_of_agents:
             dict_of_agents.setdefault(agent,1)
         else:
             dict_of_agents[agent] +=1       #if already in the dictionary add +1 to request count
-print(f"Total number of different user agents: {len(dict_of_agents)}")
+print(f"Total number of different user agents: {len(dict_of_agents.keys())}")
+
 
 for agent, COUNT in dict_of_agents.items():
     print(f"Agent: {agent} had {COUNT} requests")
