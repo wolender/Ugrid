@@ -5,13 +5,17 @@ If there is no extension - an exception should be raised.
 """
 
 import argparse
+import os
 
 parser = argparse.ArgumentParser(description='Returns the extension of a provided file')
 parser.add_argument('FILENAME', help="Provide a filename")
 
 args = parser.parse_args()
 
-FILENAME=str(args.FILENAME)
+if os.path.exists(args.FILENAME):
+    FILENAME=str(args.FILENAME)
+else:
+    raise ValueError(f"ERROR no file {args.FILENAME} found")
 
 #spliting the filename in to a list of strings where . is the separator,
 # 1 for maxsplit to take multi doted extesions like .noarch.rpm
