@@ -7,6 +7,8 @@ current user, system load average, and IP address.
 Use arguments for specifying resources.
 (For example, -d for distro -m for memory,
 -c for CPU, -u for user info, -l for load average, -i for IP address).
+example:
+./systeminfo.py -dmculi
 """
 import subprocess
 import re
@@ -14,7 +16,8 @@ import argparse
 import platform
 import psutil
 
-parser = argparse.ArgumentParser(description='Resource Information')
+parser = argparse.ArgumentParser(description=
+                                 'Scripts returns system information based on parameters')
 
 parser.add_argument('-d', '--distro', help='Displays distribution info',action='store_true')
 parser.add_argument('-m', '--memory', help='Displays memory info',action='store_true')
@@ -58,6 +61,6 @@ if args.ip:
     #use reg expr to get ip address
     ip_address = re.findall(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}", IFCOFIG_OUTPUT)
 
-for address in ip_address:
-    if "127.0.0.1" not in address and ".255" not in address:
-        print(f"IP Address: {address}")
+    for address in ip_address:
+        if "127.0.0.1" not in address and ".255" not in address:
+            print(f"IP Address: {address}")
