@@ -9,10 +9,8 @@ services:
 
   surveymonkey:
     image: sm:latest
-    volumes:
-      - ./send_email.py:/send_email.py
     networks:
-      - monkeynetwork
+      - monkeynetwork 
 
 networks:
   monkeynetwork:
