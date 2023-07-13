@@ -14,17 +14,37 @@ owner_tag="wolender"
 project_tag="2023_internship_warsaw"
 my_ip="78.11.118.186/32"
 vpc_id=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=vpc_wolender" --query 'Vpcs[0].VpcId')
-if [[ ! $vpc_id ]]; then
+if [[ $vpc_id == "None" ]]; then
     vpc_id=$(aws ec2 create-vpc --cidr-block 10.0.0.0/16 --query 'Vpc.VpcId' --output text --tag-specifications 'ResourceType=vpc, Tags= [{Key=Name,Value=vpc_wolender},{Key=Project,Value=2023_internship_warsaw},{Key=Owner,Value=wolender}]' )
 else
     echo "vpc exists"
 fi
 subnet_id=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=sb_wolender" --query 'Subnets[*].SubnetId')
-if [[ ! $subnet_id ]]; then
+if [[ $subnet_id == "None" ]]; then
     subnet_id=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block 10.0.1.0/24 --query 'Subnet.SubnetId' --output text --tag-specifications 'ResourceType=subnet, Tags= [{Key=Name,Value=sb_wolender},{Key=Project,Value=2023_internship_warsaw},{Key=Owner,Value=wolender}]')
 else
     echo "subnet exists"
 fi
+#creating inteernet gateway
+gate_id=$(aws ec2 describe-internet-gateways --filters "Name=tag:Name,Values=gate_wolender" --query 'InternetGateways[0].InternetGatewayId' --output text)
+if [[ $gate_id == "None" ]]; then
+    aws ec2 create-internet-gateway --tag-specifications 'ResourceType=internet-gateway, Tags= [{Key=Name,Value=gate_wolender},{Key=Project,Value=2023_internship_warsaw},{Key=Owner,Value=wolender}]'
+else
+    echo "gateway exists"
+fi
+#creating route table
+route_id=$(aws ec2 describe-route-tables --filter "Name=tag:Name,Values=out_route_wolender" --query 'RouteTables[0].RouteTableId' --output text)
+if [[ $route_id == "None" ]]; then 
+    route_id=$(aws ec2 create-route-table --vpc-id $vpc_id --tag-specifications 'ResourceType=route-table, Tags= [{Key=Name,Value=out_route_wolender},{Key=Project,Value=2023_internship_warsaw},{Key=Owner,Value=wolender}]')
+else
+    echo "route table exists"
+fi
+
+aws ec2 attach-internet-gateway --vpc-id $vpc_id --internet-gateway-id $gate_id 2> /dev/null
+
+aws ec2 associate-route-table --route-table-id $route_id --subnet-id $subnet_id > /dev/null
+
+aws ec2 create-route --route-table-id $route_id --destination-cidr-block 0.0.0.0/24 --gateway-id $gate_id > /dev/null
 
 security_group_id=$(aws ec2 describe-security-groups --filters "Name=tag:Name,Values=sg_wolender" --query 'SecurityGroups[*].GroupId' --output text)
 
@@ -38,8 +58,16 @@ aws ec2 authorize-security-group-ingress --group-id $security_group_id --protoco
 aws ec2 authorize-security-group-ingress --group-id $security_group_id --protocol tcp --port 80 --cidr "0.0.0.0/0"
 aws ec2 authorize-security-group-ingress --group-id $security_group_id --protocol tcp --port 433 --cidr "0.0.0.0/0"
 
+#creating ECR registry
+repository_uri=$(aws ecr describe-repositories --repository-names wolender-ecr-repo --query 'repositories[*].repositoryUri' --output text)
+if [[ ! $repository_uri ]]; then
+    repository_uri=$(aws ecr create-repository --repository-name wolender-ecr-repo --tags Key=Environment,Value=Dev Key=Project,Value=$project_tag)
+else
+    echo "rerpository exists"
+fi
 
 echo "VPC ID: $vpc_id"
 echo "SUBNET ID: $subnet_id"
 echo "SEC_GROUP ID: $security_group_id"
+echo "REPOSITORY URI: $repository_uri"
 
