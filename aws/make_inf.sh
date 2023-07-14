@@ -13,19 +13,20 @@
 owner_tag="wolender"
 project_tag="2023_internship_warsaw"
 my_ip="78.11.118.186/32"
+ami="ami-07ce6ac5ac8a0ee6f"
 vpc_id=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=vpc_wolender" --query 'Vpcs[0].VpcId')
 if [[ $vpc_id == "None" ]]; then
     vpc_id=$(aws ec2 create-vpc --cidr-block 10.0.0.0/16 --query 'Vpc.VpcId' --output text --tag-specifications 'ResourceType=vpc, Tags= [{Key=Name,Value=vpc_wolender},{Key=Project,Value=2023_internship_warsaw},{Key=Owner,Value=wolender}]' )
 else
     echo "vpc exists"
 fi
-subnet_id=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=sb_wolender" --query 'Subnets[*].SubnetId')
-if [[ $subnet_id == "None" ]]; then
+subnet_id=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=sb_wolender" --query 'Subnets[*].SubnetId' --output text)
+if [[ $subnet_id == "" ]]; then
     subnet_id=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block 10.0.1.0/24 --query 'Subnet.SubnetId' --output text --tag-specifications 'ResourceType=subnet, Tags= [{Key=Name,Value=sb_wolender},{Key=Project,Value=2023_internship_warsaw},{Key=Owner,Value=wolender}]')
 else
     echo "subnet exists"
 fi
-#creating inteernet gateway
+#creating internet gateway
 gate_id=$(aws ec2 describe-internet-gateways --filters "Name=tag:Name,Values=gate_wolender" --query 'InternetGateways[0].InternetGatewayId' --output text)
 if [[ $gate_id == "None" ]]; then
     aws ec2 create-internet-gateway --tag-specifications 'ResourceType=internet-gateway, Tags= [{Key=Name,Value=gate_wolender},{Key=Project,Value=2023_internship_warsaw},{Key=Owner,Value=wolender}]'
@@ -42,7 +43,7 @@ fi
 
 aws ec2 attach-internet-gateway --vpc-id $vpc_id --internet-gateway-id $gate_id 2> /dev/null
 
-aws ec2 associate-route-table --route-table-id $route_id --subnet-id $subnet_id > /dev/null
+aws ec2 associate-route-table --route-table-id $route_id --subnet-id $subnet_id 2> /dev/null
 
 aws ec2 create-route --route-table-id $route_id --destination-cidr-block 0.0.0.0/24 --gateway-id $gate_id > /dev/null
 
@@ -54,18 +55,57 @@ else
     echo "security group exists"
 fi
 
-aws ec2 authorize-security-group-ingress --group-id $security_group_id --protocol tcp --port 22 --cidr $my_ip
-aws ec2 authorize-security-group-ingress --group-id $security_group_id --protocol tcp --port 80 --cidr "0.0.0.0/0"
-aws ec2 authorize-security-group-ingress --group-id $security_group_id --protocol tcp --port 433 --cidr "0.0.0.0/0"
+aws ec2 authorize-security-group-ingress --group-id $security_group_id --protocol tcp --port 22 --cidr $my_ip 2> /dev/null
+aws ec2 authorize-security-group-ingress --group-id $security_group_id --protocol tcp --port 80 --cidr "0.0.0.0/0" 2> /dev/null
+aws ec2 authorize-security-group-ingress --group-id $security_group_id --protocol tcp --port 433 --cidr "0.0.0.0/0" 2> /dev/null
 
 #creating ECR registry
 repository_uri=$(aws ecr describe-repositories --repository-names wolender-ecr-repo --query 'repositories[*].repositoryUri' --output text)
 if [[ ! $repository_uri ]]; then
-    repository_uri=$(aws ecr create-repository --repository-name wolender-ecr-repo --tags Key=Environment,Value=Dev Key=Project,Value=$project_tag)
+    repository_uri=$(aws ecr create-repository --repository-name wolender-ecr-repo --query 'repositories[].repositoryUri' --tags Key=Environment,Value=Dev Key=Project,Value=$project_tag)
 else
     echo "rerpository exists"
 fi
 
+
+instance_id=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=ec2_wolender" "Name=instance-state-name,Values=running" --query "Reservations[].Instances[].InstanceId" --output text)
+echo $instance_id
+if [[ $instance_id == "" ]]; then
+    instance_id=$(aws ec2 run-instances --image-id $ami --count 1 --query 'Instances[0].InstanceId' --instance-type t2.micro --key-name wolender_key --subnet-id $subnet_id --security-group-ids $sec_group_id --tag-specifications 'ResourceType=instance, Tags= [{Key=Name,Value=ec2_wolender},{Key=Project,Value=2023_internship_warsaw},{Key=Owner,Value=wolender}]' --user-data '#!/bin/bash
+yum update -y
+yum install -y docker
+service docker start
+usermod -a -G docker ec2-user')
+
+echo $instance_id
+else
+    echo "instance exists"
+fi
+
+public_address=$(aws ec2 describe-addresses --filters "Name=tag:Name,Values=ip_wolender" --query 'Addresses[0].PublicIp')
+if [[ $public_address == "None" ]]; then
+    public_address=$(aws ec2 allocate-address --domain $vpc_id --query PublicIp --tag-specifications 'ResourceType=elastic-ip, Tags= [{Key=Name,Value=ip_wolender},{Key=Project,Value=2023_internship_warsaw},{Key=Owner,Value=wolender}]')
+else
+    echo "address exists"
+fi
+
+instance_status=$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[].Instances[].State.Name' --output text)
+
+while true; do
+    instance_status=$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[].Instances[].State.Name' --output text)
+
+    if [[ $instance_status == "running" ]]; then
+        echo "instance started, alocating arddress"
+        aws ec2 associate-address --instance-id $instance_id --public-ip $public_address   
+        break
+    else
+        sleep 2
+        echo "$instance_status waiting for instance to start"
+    fi
+done
+
+echo "INSTANCE IP: $public_address"
+echo "INSTANCE ID: $instance_id"
 echo "VPC ID: $vpc_id"
 echo "SUBNET ID: $subnet_id"
 echo "SEC_GROUP ID: $security_group_id"
