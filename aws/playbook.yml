@@ -10,7 +10,7 @@
 
     - name: Copy credentials
       copy:
-        src: /Users/wolender/.aws/
+        src: ~/.aws/
         dest: .aws/
 
     - name: Get ECR login password

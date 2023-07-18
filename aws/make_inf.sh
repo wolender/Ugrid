@@ -12,14 +12,15 @@
 # Step 1: Create a VPC
 owner_tag="wolender"
 project_tag="2023_internship_warsaw"
-my_ip="85.232.252.1/32"
+my_ip="78.11.118.186/32"
 ami="ami-07ce6ac5ac8a0ee6f"
 vpc_id=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=vpc_wolender" --query 'Vpcs[0].VpcId' --output text)
 
 if [[ $vpc_id == "None" ]]; then
     echo "creating vpc..."
     vpc_id=$(aws ec2 create-vpc --cidr-block 10.0.0.0/16 --query 'Vpc.VpcId' --output text --tag-specifications 'ResourceType=vpc, Tags= [{Key=Name,Value=vpc_wolender},{Key=Project,Value=2023_internship_warsaw},{Key=Owner,Value=wolender}]' )
-    sleep 2
+    aws ec2 wait vpc-exists \
+    --vpc-ids $vpc_id
 else
     echo "vpc exists"
 fi
@@ -96,6 +97,7 @@ if [[ $public_address == "None" ]]; then
     echo "creating elascit ip address..."
     public_address=$(aws ec2 allocate-address --domain $vpc_id --query PublicIp --tag-specifications 'ResourceType=elastic-ip, Tags= [{Key=Name,Value=ip_wolender},{Key=Project,Value=2023_internship_warsaw},{Key=Owner,Value=wolender}]')
 else
+    public_address=$(aws ec2 describe-addresses --filters "Name=tag:Name,Values=ip_wolender" --query 'Addresses[0].PublicIp')
     echo "address exists"
 fi
 
@@ -105,6 +107,8 @@ while true; do
     instance_status=$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[].Instances[].State.Name' --output text)
 
     if [[ $instance_status == "running" ]]; then
+    
+        aws ec2 wait instance-running --instance-ids $instance_id
         echo "instance started, alocating arddress"
         aws ec2 associate-address --instance-id $instance_id --public-ip $public_address
         break
@@ -129,3 +133,5 @@ export REPOSITORY_URI=$repository_uri
 echo "Running deployment script..."
 sleep 2
 ansible-playbook playbook.yml
+
+open http://$public_address:8080
