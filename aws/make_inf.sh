@@ -66,6 +66,7 @@ echo "adding inbound traffic rules..."
 aws ec2 authorize-security-group-ingress --group-id $security_group_id --protocol tcp --port 22 --cidr $my_ip 2> /dev/null
 aws ec2 authorize-security-group-ingress --group-id $security_group_id --protocol tcp --port 80 --cidr "0.0.0.0/0" 2> /dev/null
 aws ec2 authorize-security-group-ingress --group-id $security_group_id --protocol tcp --port 433 --cidr "0.0.0.0/0" 2> /dev/null
+aws ec2 authorize-security-group-ingress --group-id $security_group_id --protocol tcp --port 8080 --cidr "0.0.0.0/0" 2> /dev/null
 
 #creating ECR registry
 repository_uri=$(aws ecr describe-repositories --repository-names wolender-ecr-repo --query 'repositories[*].repositoryUri' --output text 2> /dev/null)
@@ -84,7 +85,8 @@ yum update -y
 yum install -y docker
 service docker start
 usermod -a -G docker ec2-user
-chown ec2-user:docker /var/run/docker.sock')
+chown ec2-user:docker /var/run/docker.sock
+')
 else
     echo "instance exists"
 fi
@@ -104,7 +106,7 @@ while true; do
 
     if [[ $instance_status == "running" ]]; then
         echo "instance started, alocating arddress"
-        aws ec2 associate-address --instance-id $instance_id --public-ip $public_address  > /dev/null 
+        aws ec2 associate-address --instance-id $instance_id --public-ip $public_address
         break
     else
         sleep 2
@@ -119,3 +121,11 @@ echo "SUBNET ID: $subnet_id"
 echo "SEC_GROUP ID: $security_group_id"
 echo "REPOSITORY URI: $repository_uri"
 
+echo "ec2-user@$public_address" > inventory
+export INSTANCE_IP=$public_address
+export INSTANCE_ID=$instance_id
+export REPOSITORY_URI=$repository_uri
+
+echo "Running deployment script..."
+sleep 2
+ansible-playbook playbook.yml
