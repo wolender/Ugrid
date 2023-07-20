@@ -4,3 +4,5 @@
 /python_scripts/task6/__py*
 /python_scripts/task6/emailbot/__pycache__
 /python_scripts/task6/apicall/__pycache__
+/python_scripts/task6_local/smtp/__pycache__
+/python_scripts/task6_local/apicall/__pycache__
