@@ -18,9 +18,8 @@ else:
     raise ValueError(f"ERROR no file {args.FILENAME} found")
 
 #spliting the filename in to a list of strings where . is the separator,
-# 1 for maxsplit to take multi doted extesions like .noarch.rpm
-filelist=FILENAME.split('.',1)
+filelist=FILENAME.split('.')
 
 if len(filelist) < 2:
     raise ValueError("ERROR File does not have an extension")
-print(f"The extension of the file is: {filelist[1]}")
+print(f"The extension of the file is: {filelist[-1]}")
