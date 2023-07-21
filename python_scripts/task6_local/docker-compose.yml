@@ -1,0 +1,16 @@
+services:
+  smtp_server:
+    image: rnwood/smtp4dev:v3
+    networks:
+      - monkeynetwork
+    ports:
+      - "2525:25"
+      - "3000:80"
+
+  surveymonkey:
+    image: sm:latest
+    networks:
+      - monkeynetwork 
+
+networks:
+  monkeynetwork:

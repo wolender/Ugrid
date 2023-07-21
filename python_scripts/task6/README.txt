@@ -1,0 +1,8 @@
+pip install -r requirements.txt
+
+#move cred.json to python_scripts/task6/ directory to authenticate
+mv cred.json python_scripts/task6/cred.json
+
+./main.py
+first time running the script log in using msurvey203@gmail.com surveymonkey123
+#Aplication send out messeges to addresses from recipients.txt file
