@@ -16,6 +16,11 @@ import argparse
 import platform
 import psutil
 
+
+def bytes_to_gb(bytes_val):
+    """bytes to giga bytes transformation"""
+    return round(bytes_val / (1024 ** 3), 2)
+
 parser = argparse.ArgumentParser(description=
                                  'Scripts returns system information based on parameters')
 
@@ -34,11 +39,15 @@ if args.distro:
 
 if args.memory:
     memory = psutil.virtual_memory()
-
+    procent_mem= memory.percent
+    total_mem = bytes_to_gb(memory.total)
+    used_mem = bytes_to_gb(memory.used)
+    free_mem = round(bytes_to_gb(memory.total)-bytes_to_gb(memory.used),2)
     print(f"""
-        Total Memory: {memory.total/1000000000:.2f} GBs,
-        Used: {memory.used/1000000000:.2f} GBs,
-        Free: {memory.free/1000000000:.2f} GBs
+        Memmory usage: {procent_mem}%
+        Total Memory: {total_mem} GBs,
+        Used: {used_mem} GBs,
+        Free: {free_mem} GBs
         """)
 
 if args.cpu:
@@ -60,7 +69,11 @@ if args.ip:
     IFCOFIG_OUTPUT = subprocess.check_output(['ifconfig']).decode('utf-8')
     #use reg expr to get ip address
     ip_address = re.findall(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}", IFCOFIG_OUTPUT)
-
+    unique_addresses=[]
     for address in ip_address:
         if "127.0.0.1" not in address and ".255" not in address:
-            print(f"IP Address: {address}")
+            if address not in unique_addresses:
+                unique_addresses.append(address)
+
+    for address in unique_addresses:
+        print(f"IP Address: {address}")
