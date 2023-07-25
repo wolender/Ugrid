@@ -24,6 +24,7 @@ if [[ $vpc_id == "None" ]]; then
 else
     echo "vpc exists"
 fi
+echo "Vpc ID: $vpc_id"
 subnet_id=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=sb_wolender" --query 'Subnets[*].SubnetId' --output text)
 if [[ $subnet_id == "" ]]; then
     echo "creating subnet..."
@@ -70,15 +71,16 @@ aws ec2 authorize-security-group-ingress --group-id $security_group_id --protoco
 aws ec2 authorize-security-group-ingress --group-id $security_group_id --protocol tcp --port 8080 --cidr "0.0.0.0/0" 2> /dev/null
 
 #creating ECR registry
-repository_uri=$(aws ecr describe-repositories --repository-names wolender-ecr-repo --query 'repositories[*].repositoryUri' --output text 2> /dev/null)
+ecr_name="wolender-ecr-repo"
+repository_uri=$(aws ecr describe-repositories --repository-names $ecr_name --query 'repositories[*].repositoryUri' --output text 2> /dev/null)
 if [[ ! $repository_uri ]]; then
     echo "creating ecr repository..."
-    repository_uri=$(aws ecr create-repository --repository-name wolender-ecr-repo --query 'repository.repositoryUri' --tags Key=Environment,Value=Dev Key=Project,Value=$project_tag)
+    repository_uri=$(aws ecr create-repository --repository-name $ecr_name --query 'repository.repositoryUri' --tags Key=Environment,Value=Dev Key=Project,Value=$project_tag)
 else
     echo "repository exists"
 fi
-
-
+echo "Repo URI $repository_uri"
+#lunching instance
 instance_id=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=ec2_wolender" "Name=instance-state-name,Values=running" --query "Reservations[].Instances[].InstanceId" --output text)
 if [[ $instance_id == "" ]]; then
     instance_id=$(aws ec2 run-instances --image-id $ami --count 1 --query 'Instances[0].InstanceId' --instance-type t2.micro --key-name wolender_key --subnet-id $subnet_id --security-group-ids $security_group_id --tag-specifications 'ResourceType=instance, Tags= [{Key=Name,Value=ec2_wolender},{Key=Project,Value=2023_internship_warsaw},{Key=Owner,Value=wolender}]' --user-data '#!/bin/bash
@@ -91,6 +93,7 @@ chown ec2-user:docker /var/run/docker.sock
 else
     echo "instance exists"
 fi
+echo "Instance ID $instance_id"
 
 public_address=$(aws ec2 describe-addresses --filters "Name=tag:Name,Values=ip_wolender" --query 'Addresses[0].PublicIp')
 if [[ $public_address == "None" ]]; then
@@ -100,7 +103,7 @@ else
     public_address=$(aws ec2 describe-addresses --filters "Name=tag:Name,Values=ip_wolender" --query 'Addresses[0].PublicIp')
     echo "address exists"
 fi
-
+echo "Instance IP: $public_address"
 instance_status=$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[].Instances[].State.Name' --output text)
 
 while true; do
@@ -118,6 +121,11 @@ while true; do
     fi
 done
 
+# add role to ec2 tha enables images to be pulled allow_ec2_ecr
+role="allow_ec2_ecr"
+aws ec2 associate-iam-instance-profile --instance-id $instance_id --iam-instance-profile Name=$role 2>/dev/null
+
+
 echo "INSTANCE IP: $public_address"
 echo "INSTANCE ID: $instance_id"
 echo "VPC ID: $vpc_id"
@@ -129,9 +137,18 @@ echo "ec2-user@$public_address" > inventory
 export INSTANCE_IP=$public_address
 export INSTANCE_ID=$instance_id
 export REPOSITORY_URI=$repository_uri
+export REPOSITORY_NAME=$ecr_name
 
+echo "========================="
+echo "building app.."
+echo "========================="
+cd ../spring-petclinic
+source ./build.sh
+echo "waiting for instance os..."
+#sleep 60
 echo "Running deployment script..."
-sleep 2
+
+cd ../aws
 ansible-playbook playbook.yml
 
 open http://$public_address:8080

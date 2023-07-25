@@ -2,26 +2,13 @@
 - hosts: all
   become: false
   tasks:
-    - name: Make dir
-      ansible.builtin.file:
-        path: .aws
-        state: directory
-        mode: '0755'
+    # - name: Get ECR login password
+    #   command: aws ecr get-login-password --region eu-central-1
+    #   register: ecr_login
 
-    - name: Copy credentials
-      copy:
-        src: ~/.aws/
-        dest: .aws/
-
-    - name: Get ECR login password
-      command: aws ecr get-login-password --region eu-central-1
-      register: ecr_login
-
-    - name: Log in to ECR
-      command: docker login --username AWS --password-stdin {{ lookup('env', 'REPOSITORY_URI') }}
-      args:
-        stdin: "{{ ecr_login.stdout }}"
-
+    - name: Pull image
+      command: docker pull {{ lookup('env', 'REPOSITORY_URI') }}:latest
     - name: Run container
       ansible.builtin.command:
         cmd: docker run -d -p 8080:8080 {{ lookup('env', 'REPOSITORY_URI') }}:latest
+
