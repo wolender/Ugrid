@@ -11,6 +11,7 @@
 
 # Step 1: Create a VPC
 owner_tag="wolender"
+aws_region="eu-central-1"
 project_tag="2023_internship_warsaw"
 my_ip="78.11.118.186/32"
 ami="ami-07ce6ac5ac8a0ee6f"
@@ -138,6 +139,7 @@ export INSTANCE_IP=$public_address
 export INSTANCE_ID=$instance_id
 export REPOSITORY_URI=$repository_uri
 export REPOSITORY_NAME=$ecr_name
+export AWS_REGION=$aws_region
 
 echo "========================="
 echo "building app.."
