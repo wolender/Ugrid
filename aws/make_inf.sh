@@ -13,7 +13,7 @@
 owner_tag="wolender"
 aws_region="eu-central-1"
 project_tag="2023_internship_warsaw"
-my_ip="78.11.118.186/32"
+my_ip="0.0.0.0/0"
 ami="ami-07ce6ac5ac8a0ee6f"
 vpc_id=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=vpc_wolender" --query 'Vpcs[0].VpcId' --output text)
 
@@ -29,7 +29,7 @@ echo "Vpc ID: $vpc_id"
 subnet_id=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=sb_wolender" --query 'Subnets[*].SubnetId' --output text)
 if [[ $subnet_id == "" ]]; then
     echo "creating subnet..."
-    subnet_id=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block 10.0.1.0/24 --query 'Subnet.SubnetId' --output text --tag-specifications 'ResourceType=subnet, Tags= [{Key=Name,Value=sb_wolender},{Key=Project,Value=2023_internship_warsaw},{Key=Owner,Value=wolender}]')
+    subnet_id=$(aws ec2 create-subnet --vpc-id $vpc_id --cidr-block 10.0.0.0/24 --query 'Subnet.SubnetId' --output text --tag-specifications 'ResourceType=subnet, Tags= [{Key=Name,Value=sb_wolender},{Key=Project,Value=2023_internship_warsaw},{Key=Owner,Value=wolender}]')
 else
     echo "subnet exists"
 fi
@@ -51,9 +51,9 @@ else
 fi
 
 echo "ataching gateway..."
-aws ec2 attach-internet-gateway --vpc-id $vpc_id --internet-gateway-id $gate_id &> /dev/null
+aws ec2 attach-internet-gateway --vpc-id $vpc_id --internet-gateway-id $gate_id 2> /dev/null
 
-aws ec2 associate-route-table --route-table-id $route_id --subnet-id $subnet_id > /dev/null
+aws ec2 associate-route-table --route-table-id $route_id --subnet-id $subnet_id 2> /dev/null
 echo "creating routes..."
 aws ec2 create-route --route-table-id $route_id --destination-cidr-block 0.0.0.0/0 --gateway-id $gate_id > /dev/null
 
@@ -70,6 +70,8 @@ aws ec2 authorize-security-group-ingress --group-id $security_group_id --protoco
 aws ec2 authorize-security-group-ingress --group-id $security_group_id --protocol tcp --port 80 --cidr "0.0.0.0/0" 2> /dev/null
 aws ec2 authorize-security-group-ingress --group-id $security_group_id --protocol tcp --port 433 --cidr "0.0.0.0/0" 2> /dev/null
 aws ec2 authorize-security-group-ingress --group-id $security_group_id --protocol tcp --port 8080 --cidr "0.0.0.0/0" 2> /dev/null
+
+
 
 #creating ECR registry
 ecr_name="wolender-ecr-repo"
@@ -147,7 +149,7 @@ echo "========================="
 cd ../spring-petclinic
 source ./build.sh
 echo "waiting for instance os..."
-#sleep 60
+sleep 60
 echo "Running deployment script..."
 
 cd ../aws

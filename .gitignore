@@ -1,2 +1,3 @@
 .DS_Store
 ./sprng-petclinic/target
+./sprng-petclinic/*.log
